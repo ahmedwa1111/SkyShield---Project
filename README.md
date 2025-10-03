@@ -7,7 +7,7 @@ SkyShield is an air quality monitoring and pollution analysis system developed f
 [NASA’s Tropospheric Emissions]
 
 ## 👥 Team BlueForce
-- **Ahmed Wael** (Team Lead & Creator)
+- **Ahmed Wael** (Creator)
 - [Habiba Mohamed 
 - Mohamed Hesham
 - Mariam ayman
