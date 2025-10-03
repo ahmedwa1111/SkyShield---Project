@@ -1,4 +1,19 @@
 
+# ================================================================
+# Project   : SkyShield
+# Team      : BluraForce
+# Creator   : Ahmed Wael
+# Event     : NASA Space Apps Challenge
+# Date      : 2025
+#
+# Copyright (c) 2025 BluraForce Team
+# All rights reserved.
+#
+# This code is part of the SkyShield project.
+# Unauthorized copying, modification, distribution, or use of this
+# code, via any medium, is strictly prohibited without written consent
+# from the BluraForce Team.
+# ================================================================
 """
 ###############################################################################
 # PROJECT: SkyShield
@@ -15,7 +30,7 @@ SkyShield - NASA Space Apps Challenge 2025
 Team: BlueForce
 Creator: Ahmed Wael
 File: {Final}.py
-Description: {Your challenge is to develop a web-based app that forecasts air quality by integrating real-time TEMPO data with ground-based air quality measurements and weather data}
+Description: {challenge is to develop a web-based app that forecasts air quality by integrating real-time TEMPO data with ground-based air quality measurements and weather data}
 Last Updated: {10/4/2025}
 
 NASA Challenge: {Monitoring of Pollution (TEMPO) mission is revolutionizing air quality monitoring across North America by enabling better forecasts and reducing pollutant exposure}
@@ -1043,3 +1058,4 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n💥 Fatal error: {e}")
         logger.error(f"Fatal error: {e}")
+
