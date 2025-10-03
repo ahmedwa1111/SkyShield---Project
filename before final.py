@@ -1,3 +1,24 @@
+"""
+###############################################################################
+# PROJECT: SkyShield
+# TEAM: BlueForce
+# CREATOR: Ahmed Wael
+# EVENT: NASA Space Apps Challenge 2025
+# DESCRIPTION: Air Quality Monitoring and Pollution Analysis System
+# REPOSITORY: [github url https://github.com/ahmedwa1111/SkyShield---Project]
+# NASA PROJECT PAGE: [https://www.spaceappschallenge.org/2025/find-a-team/bulra-force/?tab=details]
+###############################################################################
+"""
+"""
+SkyShield - NASA Space Apps Challenge 2025
+Team: BlueForce
+Creator: Ahmed Wael
+File: {before final}.py
+Description: {brief description of file purpose}
+Last Updated: {10/3/2025}
+
+NASA Challenge: {Monitoring of Pollution (TEMPO) mission is revolutionizing air quality monitoring across North America by enabling better forecasts and reducing pollutant exposure}
+"""
 import os
 import time
 import requests
@@ -764,5 +785,6 @@ if __name__ == "__main__":
         import requests
         import pandas as pd
         from bs4 import BeautifulSoup
+
 
     main()
