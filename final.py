@@ -1,3 +1,4 @@
+
 """
 ###############################################################################
 # PROJECT: SkyShield
@@ -5,7 +6,7 @@
 # CREATOR: Ahmed Wael
 # EVENT: NASA Space Apps Challenge 2025
 # DESCRIPTION: Air Quality Monitoring and Pollution Analysis System
-# REPOSITORY: [github url https://github.com/ahmedwa1111/SkyShield---Project]
+# REPOSITORY: [https://github.com/ahmedwa1111/SkyShield---Project/]
 # NASA PROJECT PAGE: [https://www.spaceappschallenge.org/2025/find-a-team/bulra-force/?tab=details]
 ###############################################################################
 """
@@ -13,12 +14,13 @@
 SkyShield - NASA Space Apps Challenge 2025
 Team: BlueForce
 Creator: Ahmed Wael
-File: {before final}.py
-Description: {brief description of file purpose}
+File: {Final}.py
+Description: {Your challenge is to develop a web-based app that forecasts air quality by integrating real-time TEMPO data with ground-based air quality measurements and weather data}
 Last Updated: {10/3/2025}
 
 NASA Challenge: {Monitoring of Pollution (TEMPO) mission is revolutionizing air quality monitoring across North America by enabling better forecasts and reducing pollutant exposure}
 """
+
 import os
 import time
 import requests
@@ -57,7 +59,7 @@ def setup_logging():
     console_handler.setFormatter(formatter)
 
     # File handler with UTF-8 encoding
-    file_handler = logging.FileHandler('indonesia_air_quality.log', encoding='utf-8')
+    file_handler = logging.FileHandler('newyork_air_quality.log', encoding='utf-8')
     file_handler.setLevel(logging.INFO)
     file_handler.setFormatter(formatter)
 
@@ -72,22 +74,21 @@ def setup_logging():
 logger = setup_logging()
 
 # ---------------------------
-# CONFIGURATION FOR INDONESIA
+# CONFIGURATION FOR NEW YORK
 # ---------------------------
 CONFIG = {
     "location": {
-        "name": "Jakarta, Indonesia",
-        "lat": -6.2088,
-        "lon": 106.8456,
-        "city": "Jakarta"
+        "name": "New York, USA",
+        "lat": 40.7128,
+        "lon": -74.0060,
+        "city": "New York"
     },
     "update_interval_minutes": 30,
     "data_sources": {
-        "tempo_iku": "https://iku.tempo.co",
         "iqair": "https://api.airvisual.com/v2/",
         "open_aq": "https://api.openaq.org/v2/",
-        "bmkg": "https://data.bmkg.go.id/",
-        "klhk": "http://iku.menlhk.go.id/"
+        "epa": "https://www.airnow.gov/",
+        "weather_gov": "https://api.weather.gov/"
     },
     "api_keys": {
         "iqair": "f60e848b-f405-4bfe-a096-c9935e595165"
@@ -95,41 +96,41 @@ CONFIG = {
 }
 
 # ---------------------------
-# HEALTH THRESHOLDS (Based on Indonesian KLHK standards)
+# HEALTH THRESHOLDS (Based on US EPA standards)
 # ---------------------------
 HEALTH_THRESHOLDS = {
     "PM2_5": {
-        "GOOD": 15, "MODERATE": 35, "BAD": 55, "UNITS": "μg/m³",
+        "GOOD": 12, "MODERATE": 35, "BAD": 55, "UNITS": "μg/m³",
         "GOOD_DESC": "Good - healthy air quality",
         "MODERATE_DESC": "Moderate - acceptable air quality",
         "BAD_DESC": "Unhealthy - sensitive groups affected"
     },
     "PM10": {
-        "GOOD": 50, "MODERATE": 100, "BAD": 250, "UNITS": "μg/m³",
+        "GOOD": 54, "MODERATE": 154, "BAD": 254, "UNITS": "μg/m³",
         "GOOD_DESC": "Good - healthy air quality",
         "MODERATE_DESC": "Moderate - acceptable air quality",
         "BAD_DESC": "Unhealthy - sensitive groups affected"
     },
     "NO2": {
-        "GOOD": 80, "MODERATE": 150, "BAD": 400, "UNITS": "μg/m³",
+        "GOOD": 53, "MODERATE": 100, "BAD": 360, "UNITS": "ppb",
         "GOOD_DESC": "Good - low vehicle pollution",
         "MODERATE_DESC": "Moderate - medium vehicle pollution",
         "BAD_DESC": "Unhealthy - high vehicle pollution"
     },
     "O3": {
-        "GOOD": 80, "MODERATE": 120, "BAD": 180, "UNITS": "μg/m³",
+        "GOOD": 54, "MODERATE": 70, "BAD": 85, "UNITS": "ppb",
         "GOOD_DESC": "Good - low ozone levels",
         "MODERATE_DESC": "Moderate - increased ozone",
         "BAD_DESC": "Unhealthy - high ozone levels"
     },
     "SO2": {
-        "GOOD": 50, "MODERATE": 100, "BAD": 300, "UNITS": "μg/m³",
+        "GOOD": 35, "MODERATE": 75, "BAD": 185, "UNITS": "ppb",
         "GOOD_DESC": "Good - low industrial pollution",
         "MODERATE_DESC": "Moderate - medium industrial pollution",
         "BAD_DESC": "Unhealthy - high industrial pollution"
     },
     "CO": {
-        "GOOD": 2, "MODERATE": 5, "BAD": 10, "UNITS": "mg/m³",
+        "GOOD": 4.4, "MODERATE": 9.4, "BAD": 12.4, "UNITS": "ppm",
         "GOOD_DESC": "Good - clean combustion",
         "MODERATE_DESC": "Moderate - incomplete combustion",
         "BAD_DESC": "Unhealthy - poor combustion"
@@ -143,124 +144,10 @@ run_count = 0
 
 
 # ---------------------------
-# INDONESIA DATA SOURCES
+# NEW YORK DATA SOURCES
 # ---------------------------
-def get_tempo_iku_data():
-    """Get air quality data from Tempo.co IKU"""
-    try:
-        # Try to access Tempo IKU API or scrape data
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        }
-
-        # Try direct API endpoint (if available)
-        url = "https://iku.tempo.co/api/station"
-        response = requests.get(url, headers=headers, timeout=10)
-
-        if response.status_code == 200:
-            data = response.json()
-            return process_tempo_data(data)
-        else:
-            # Fallback to web scraping
-            return scrape_tempo_website()
-
-    except Exception as e:
-        logger.error("Tempo IKU error: %s", e)
-        return []
-
-
-def scrape_tempo_website():
-    """Scrape Tempo IKU website for air quality data"""
-    try:
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        }
-
-        response = requests.get(CONFIG["data_sources"]["tempo_iku"], headers=headers, timeout=10)
-        soup = BeautifulSoup(response.content, 'html.parser')
-
-        results = []
-
-        # Look for air quality data elements
-        aqi_elements = soup.find_all(class_=['aqi-value', 'pollutant-value', 'number'])
-
-        for element in aqi_elements[:5]:
-            text = element.get_text().strip()
-            # Extract numeric values
-            try:
-                value = float(''.join(filter(str.isdigit, text.split('.')[0])))
-                if 0 < value < 500:  # Reasonable AQI range
-                    pollutant = "PM2_5"  # Default assumption for Tempo
-
-                    rating, indicator, description = get_health_rating(pollutant, value)
-
-                    results.append({
-                        'pollutant': pollutant,
-                        'value': value,
-                        'units': HEALTH_THRESHOLDS[pollutant]["UNITS"],
-                        'source': "Tempo.co IKU",
-                        'rating': rating,
-                        'indicator': indicator,
-                        'description': description,
-                        'type': 'GROUND'
-                    })
-            except ValueError:
-                continue
-
-        return results
-
-    except Exception as e:
-        logger.error("Tempo scraping error: %s", e)
-        return []
-
-
-def process_tempo_data(data):
-    """Process Tempo IKU API data"""
-    results = []
-
-    try:
-        # Process based on Tempo's API structure
-        if isinstance(data, list):
-            for station in data[:3]:
-                if 'pollutants' in station:
-                    for pollutant_data in station['pollutants']:
-                        poll_name = pollutant_data.get('name', '').upper()
-                        value = pollutant_data.get('value', 0)
-
-                        # Map to our pollutant types
-                        poll_map = {
-                            'PM2.5': 'PM2_5', 'PM25': 'PM2_5',
-                            'PM10': 'PM10',
-                            'NO2': 'NO2', 'NITROGEN DIOXIDE': 'NO2',
-                            'O3': 'O3', 'OZONE': 'O3',
-                            'SO2': 'SO2', 'SULFUR DIOXIDE': 'SO2',
-                            'CO': 'CO', 'CARBON MONOXIDE': 'CO'
-                        }
-
-                        if poll_name in poll_map:
-                            mapped_poll = poll_map[poll_name]
-                            rating, indicator, description = get_health_rating(mapped_poll, value)
-
-                            results.append({
-                                'pollutant': mapped_poll,
-                                'value': value,
-                                'units': HEALTH_THRESHOLDS[mapped_poll]["UNITS"],
-                                'source': f"Tempo IKU: {station.get('name', 'Unknown')}",
-                                'rating': rating,
-                                'indicator': indicator,
-                                'description': description,
-                                'type': 'GROUND'
-                            })
-
-        return results
-
-    except Exception as e:
-        logger.error("Tempo data processing error: %s", e)
-        return []
-
-
 def get_iqair_data():
-    """Get comprehensive data from IQAir/airvisual API"""
+    """Get comprehensive data from IQAir/airvisual API for New York"""
     try:
         api_key = CONFIG["api_keys"]["iqair"]
         lat, lon = CONFIG["location"]["lat"], CONFIG["location"]["lon"]
@@ -319,6 +206,10 @@ def process_iqair_data(data):
 
             for poll_key, (poll_name, value) in other_pollutants.items():
                 if value and value > 0:
+                    # Convert units for US standards if needed
+                    if poll_name == 'CO' and value < 10:  # Likely in mg/m³, convert to ppm
+                        value = value * 0.87  # Approximate conversion
+
                     rating, indicator, description = get_health_rating(poll_name, value)
 
                     results.append({
@@ -342,29 +233,31 @@ def process_iqair_data(data):
 
 
 def aqi_to_pm25(aqi):
-    """Convert AQI to PM2.5 concentration (μg/m³)"""
+    """Convert AQI to PM2.5 concentration (μg/m³) - US EPA standard"""
     # Based on US EPA conversion formula
     if aqi <= 50:
-        return (aqi * 0.5)
+        return (aqi * 12.0 / 50)
     elif aqi <= 100:
-        return (25 + (aqi - 50) * 0.5)
+        return (12.1 + (aqi - 51) * (35.4 - 12.1) / 49)
     elif aqi <= 150:
-        return (50 + (aqi - 100) * 0.5)
+        return (35.5 + (aqi - 101) * (55.4 - 35.5) / 49)
     elif aqi <= 200:
-        return (75 + (aqi - 150) * 0.5)
+        return (55.5 + (aqi - 151) * (150.4 - 55.5) / 49)
     elif aqi <= 300:
-        return (100 + (aqi - 200) * 1.0)
+        return (150.5 + (aqi - 201) * (250.4 - 150.5) / 99)
+    elif aqi <= 400:
+        return (250.5 + (aqi - 301) * (350.4 - 250.5) / 99)
     else:
-        return (200 + (aqi - 300) * 1.0)
+        return (350.5 + (aqi - 401) * (500.4 - 350.5) / 99)
 
 
 def get_openaq_data():
-    """Get data from OpenAQ platform"""
+    """Get data from OpenAQ platform for New York"""
     try:
         lat, lon = CONFIG["location"]["lat"], CONFIG["location"]["lon"]
 
-        # Get latest measurements
-        url = f"https://api.openaq.org/v2/latest?coordinates={lat},{lon}&radius=50000&limit=10"
+        # Get latest measurements for New York area
+        url = f"https://api.openaq.org/v2/latest?coordinates={lat},{lon}&radius=25000&limit=15"
 
         response = requests.get(url, timeout=10)
         if response.status_code == 200:
@@ -380,12 +273,12 @@ def get_openaq_data():
 
 
 def process_openaq_data(data):
-    """Process OpenAQ data"""
+    """Process OpenAQ data for US standards"""
     results = []
 
     try:
         if 'results' in data:
-            for station in data['results'][:5]:  # First 5 stations
+            for station in data['results'][:8]:  # First 8 stations
                 location_name = station.get('location', 'Unknown')
                 measurements = station.get('measurements', [])
 
@@ -404,10 +297,19 @@ def process_openaq_data(data):
                     if param in poll_map:
                         mapped_poll = poll_map[param]
 
-                        # Convert units if necessary
-                        if mapped_poll == 'CO' and unit == 'ppm':
-                            value = value * 1.15  # Convert ppm to mg/m³
-                            unit = 'mg/m³'
+                        # Convert units to US standards if necessary
+                        if mapped_poll == 'CO' and unit == 'µg/m³':
+                            value = value * 0.00087  # Convert µg/m³ to ppm
+                            unit = 'ppm'
+                        elif mapped_poll in ['NO2', 'O3', 'SO2'] and unit == 'µg/m³':
+                            # Convert to ppb for gases (approximate)
+                            if mapped_poll == 'NO2':
+                                value = value * 0.53  # µg/m³ to ppb
+                            elif mapped_poll == 'O3':
+                                value = value * 0.50  # µg/m³ to ppb
+                            elif mapped_poll == 'SO2':
+                                value = value * 0.38  # µg/m³ to ppb
+                            unit = 'ppb'
 
                         rating, indicator, description = get_health_rating(mapped_poll, value)
 
@@ -430,12 +332,27 @@ def process_openaq_data(data):
         return []
 
 
-def get_weather_data():
-    """Get weather data from BMKG or alternative"""
+def get_epa_data():
+    """Get data from EPA AirNow API (when available)"""
     try:
-        # Using OpenMeteo as BMKG alternative
+        # EPA AirNow API requires registration, so we'll use as backup
         lat, lon = CONFIG["location"]["lat"], CONFIG["location"]["lon"]
-        url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,wind_direction_10m,cloud_cover,visibility&temperature_unit=celsius&wind_speed_unit=ms"
+
+        # This is a placeholder for EPA API integration
+        # In production, you would add proper EPA API calls here
+
+        return []
+    except Exception as e:
+        logger.debug("EPA data not available: %s", e)
+        return []
+
+
+def get_weather_data():
+    """Get weather data for New York"""
+    try:
+        # Using OpenMeteo for reliable weather data
+        lat, lon = CONFIG["location"]["lat"], CONFIG["location"]["lon"]
+        url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,wind_direction_10m,cloud_cover,visibility&temperature_unit=fahrenheit&wind_speed_unit=mph"
 
         response = requests.get(url, timeout=10)
         if response.status_code == 200:
@@ -452,7 +369,7 @@ def get_weather_data():
                 'wind_speed': current['wind_speed_10m'],
                 'wind_direction': current['wind_direction_10m'],
                 'clouds': current['cloud_cover'],
-                'visibility': current['visibility'] / 1000,
+                'visibility': current['visibility'] / 1609.34,  # Convert to miles
                 'aqi_estimate': aqi,
                 'source': 'Open-Meteo'
             }
@@ -465,7 +382,7 @@ def get_weather_data():
 # HEALTH RATING FUNCTIONS
 # ---------------------------
 def get_health_rating(pollutant_type, value):
-    """Get health rating for a pollutant value"""
+    """Get health rating for a pollutant value using US standards"""
     if pollutant_type not in HEALTH_THRESHOLDS:
         return "UNKNOWN", "[?]", "No rating available"
 
@@ -484,7 +401,7 @@ def get_health_rating(pollutant_type, value):
 def get_health_advice(pollutant_type, rating):
     """Get health advice based on rating"""
     advice = {
-        "GOOD": "No precautions needed",
+        "GOOD": "No precautions needed - ideal for outdoor activities",
         "MODERATE": "Generally acceptable for most people",
         "UNHEALTHY": "Sensitive groups should reduce outdoor activity",
         "VERY UNHEALTHY": "Everyone should reduce outdoor exertion"
@@ -497,9 +414,9 @@ def calculate_aqi_from_weather(weather):
     score = 0
 
     # Low wind = poor dispersion
-    if weather['wind_speed_10m'] < 2:
+    if weather['wind_speed_10m'] < 5:  # mph
         score += 30
-    elif weather['wind_speed_10m'] < 5:
+    elif weather['wind_speed_10m'] < 10:
         score += 15
 
     # High humidity can trap pollutants
@@ -507,9 +424,9 @@ def calculate_aqi_from_weather(weather):
         score += 20
 
     # Low visibility indicates pollution
-    if weather['visibility'] < 5000:
+    if weather['visibility'] < 3:  # miles
         score += 40
-    elif weather['visibility'] < 10000:
+    elif weather['visibility'] < 6:
         score += 20
 
     return min(100, score)
@@ -519,8 +436,8 @@ def calculate_aqi_from_weather(weather):
 # DATA COLLECTION MASTER FUNCTION
 # ---------------------------
 def collect_all_air_quality_data():
-    """Collect data from all available sources"""
-    logger.info("Collecting Indonesia air quality data...")
+    """Collect data from all available sources for New York"""
+    logger.info("Collecting New York air quality data...")
 
     all_data = []
 
@@ -534,33 +451,33 @@ def collect_all_air_quality_data():
     openaq_data = get_openaq_data()
     all_data.extend(openaq_data)
 
-    # Try Tempo.co IKU as tertiary source
+    # Try EPA as tertiary source
     if len(all_data) < 2:  # If we don't have much data
-        logger.info("Accessing Tempo.co IKU data...")
-        tempo_data = get_tempo_iku_data()
-        all_data.extend(tempo_data)
+        logger.info("Accessing EPA data...")
+        epa_data = get_epa_data()
+        all_data.extend(epa_data)
 
     logger.info("Total %s pollution measurements found", len(all_data))
     return all_data
 
 
 # ---------------------------
-# DISPLAY RESULTS IN ENGLISH
+# DISPLAY RESULTS
 # ---------------------------
 def display_results(air_quality_data, weather_data, run_number=0):
-    """Display comprehensive results in English"""
+    """Display comprehensive results"""
     global current_data
 
     # Update current data
     current_data = air_quality_data
 
     print("\n" + "=" * 80)
-    print(f"INDONESIA AIR QUALITY MONITORING - UPDATE #{run_number}")
+    print(f"NEW YORK AIR QUALITY MONITORING - UPDATE #{run_number}")
     print("=" * 80)
     print(f"Location: {CONFIG['location']['name']}")
     print(f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"Next update in: {CONFIG['update_interval_minutes']} minutes")
-    print(f"Data Sources: IQAir, OpenAQ, Tempo.co IKU")
+    print(f"Data Sources: IQAir, OpenAQ, EPA")
 
     print(f"\n--- POLLUTION LEVELS ({len(current_data)} measurements) ---")
 
@@ -594,12 +511,12 @@ def display_results(air_quality_data, weather_data, run_number=0):
 
     print(f"\n--- WEATHER CONDITIONS ---")
     if weather_data:
-        print(f"Temperature: {weather_data['temperature']:.1f}°C")
+        print(f"Temperature: {weather_data['temperature']:.1f}°F")
         print(f"Humidity: {weather_data['humidity']}%")
-        print(f"Wind: {weather_data['wind_speed']:.1f} m/s from {weather_data['wind_direction']}°")
+        print(f"Wind: {weather_data['wind_speed']:.1f} mph from {weather_data['wind_direction']}°")
         print(f"Pressure: {weather_data['pressure']:.1f} hPa")
         print(f"Clouds: {weather_data['clouds']}%")
-        print(f"Visibility: {weather_data['visibility']:.1f} km")
+        print(f"Visibility: {weather_data['visibility']:.1f} miles")
         print(f"Estimated AQI: {weather_data['aqi_estimate']}/100")
         print(f"Source: {weather_data.get('source', 'Unknown')}")
 
@@ -658,7 +575,7 @@ def perform_update():
         if air_quality_data:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M")
             df = pd.DataFrame(air_quality_data)
-            filename = f"indonesia_air_quality_{timestamp}.csv"
+            filename = f"newyork_air_quality_{timestamp}.csv"
             df.to_csv(filename, index=False, encoding='utf-8')
             logger.info("Data saved: %s", filename)
             print(f"\nDetailed data saved to: {filename}")
@@ -704,7 +621,7 @@ def start_monitoring():
     print("Data Sources:")
     print("   • IQAir (Primary)")
     print("   • OpenAQ (Secondary)")
-    print("   • Tempo.co IKU (Tertiary)")
+    print("   • EPA (Tertiary)")
     print("   • Real-time Weather Data")
     print("=" * 80)
     print("Monitoring will run continuously until stopped (Ctrl+C)")
@@ -727,7 +644,7 @@ def start_monitoring():
         print("\n" + "=" * 80)
         print("MONITORING STOPPED")
         print("=" * 80)
-        print(" Thank you for using Indonesia Air Quality Monitoring!")
+        print(" Thank you for using New York Air Quality Monitoring!")
         print(f"Total updates performed: {run_count}")
         print(" Data saved in timestamped CSV files")
         print("=" * 80)
@@ -738,10 +655,10 @@ def start_monitoring():
 # ---------------------------
 def main():
     """Main execution function"""
-    logger.info("STARTING INDONESIA AIR QUALITY MONITORING SYSTEM")
+    logger.info("STARTING NEW YORK AIR QUALITY MONITORING SYSTEM")
 
     print("\n" + "=" * 80)
-    print("🇮🇩 INDONESIA AIR QUALITY MONITORING SYSTEM")
+    print("🗽 NEW YORK AIR QUALITY MONITORING SYSTEM")
     print("=" * 80)
     print("System Configuration:")
     print(f"   • Location: {CONFIG['location']['name']}")
@@ -750,7 +667,7 @@ def main():
     print("Integrated Data Sources:")
     print("   IQAir API (Active)")
     print("   OpenAQ Platform")
-    print("   Tempo.co IKU")
+    print("   EPA AirNow")
     print("   Real-time Weather Data")
     print("=" * 80)
 
@@ -785,6 +702,5 @@ if __name__ == "__main__":
         import requests
         import pandas as pd
         from bs4 import BeautifulSoup
-
 
     main()
