@@ -39,7 +39,8 @@ AI tools were used in the **development process** to accelerate and refine the p
 
 **Data Sources**  
 - [IQAir API](https://www.iqair.com/) – AQI & pollutants  
-- [OpenWeather API](https://openweathermap.org/api) – weather data  
+- [OpenWeather API](https://openweathermap.org/api) – weather data
+- (Tempo)API satellite https://ladsweb.modaps.eosdis.nasa.gov/search/
 - Custom pollutant estimations (CO₂, PM2.5 → AQI conversion)  
 - (Future) NASA TEMPO satellite data integration  
 
@@ -55,3 +56,4 @@ pip install -r requirements.txt
 
 # Run locally
 uvicorn api_server:app --reload --port 5000
+
