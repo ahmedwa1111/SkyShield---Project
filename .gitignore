@@ -1,0 +1,93 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+. Python
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+pip-wheel-metadata/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Next.js
+.next/
+out/
+
+# Dependency directories
+**/node_modules/
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.*
+env.local
+local.env
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+
+# Docker
+docker-compose.override.yml
+docker-compose.local.yml
+
+# Python byte-compiled
+*.pyc
+*.pyo
+*.pyd
+
+# build/test output
+htmlcov/
+/.pytest_cache/
+coverage/
+
+# Other
+*.sqlite3
+*.db
+*.cache
+*.swp
+*.tmp
+*.temp
+*.bak
+*.orig
+*.pem

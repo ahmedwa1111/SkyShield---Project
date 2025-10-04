@@ -1,0 +1,8 @@
+# Optional: Render configuration example
+# service = "web"
+
+[env]
+  # Add any default env vars here if necessary
+
+# For Render, configure a Web Service from the Dashboard and set the start command:
+# uvicorn api_server:app --host 0.0.0.0 --port $PORT
