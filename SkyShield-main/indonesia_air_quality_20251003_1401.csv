@@ -1,0 +1,2 @@
+pollutant,value,units,source,rating,indicator,description,aqi,type
+PM2_5,41.0,μg/m³,IQAir - Jakarta,UNHEALTHY,[U],Unhealthy - sensitive groups affected,82,GROUND
